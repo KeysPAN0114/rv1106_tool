@@ -276,15 +276,39 @@
 	};
 
 	fbtft@0 {
-		compatible = "sitronix,st7789v";
-		reg = <0>;
-		spi-max-frequency = <20000000>;
+		/*--------------------官方驱动屏幕代码-------------------*/
+		// compatible = "sitronix,st7789v";
+		// compatible = "sitronix,st7789v";
+		// reg = <0>;
+		// spi-max-frequency = <20000000>;
+		// fps = <30>;
+		// buswidth = <8>;
+		// debug = <0x7>;
+		// led-gpios = <&gpio2 RK_PB0 GPIO_ACTIVE_LOW>;//BL
+		// dc = <&gpio2 RK_PB1 GPIO_ACTIVE_HIGH>;      //DC
+		// reset = <&gpio1 RK_PC3 GPIO_ACTIVE_LOW>;    //RES
+		/*---------------------------------------------------*/
+ 
+		status = "okay";
+		compatible = "ilitek,ili9341";  
+		reg = <0>;					
+		spi-max-frequency = <48000000>;	// 设为48M
+		spi-cpol;
+		spi-cpha;
+		rotate = <0>;				// 旋转角度，lcd驱动里会读取并设置对应寄存器
 		fps = <30>;
+		rgb;
+		width = <240>;
+        height = <320>;
 		buswidth = <8>;
-		debug = <0x7>;
-		led-gpios = <&gpio2 RK_PB0 GPIO_ACTIVE_HIGH>;//BL
-		dc-gpios = <&gpio2 RK_PB1 GPIO_ACTIVE_HIGH>;//DC
-		reset-gpios = <&gpio1 RK_PC3 GPIO_ACTIVE_LOW>;//RES
+ 
+		// cs = <&gpio1 RK_PC3 GPIO_ACTIVE_LOW>;		//spi0_miso
+ 
+		led ;		//BL
+		dc = <&gpio2 RK_PB1 GPIO_ACTIVE_HIGH>;		//DC
+		reset = <&gpio1 RK_PC6 GPIO_ACTIVE_LOW>;	//RES
+ 
+		debug = <0x1>;	
 	};
 };
 // I2C

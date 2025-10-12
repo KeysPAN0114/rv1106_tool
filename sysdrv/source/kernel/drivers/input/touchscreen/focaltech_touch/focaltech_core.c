@@ -43,7 +43,11 @@
 /*****************************************************************************
 * Private constant and macro definitions using #define
 *****************************************************************************/
+#if 1
 #define FTS_DRIVER_NAME                     "fts_ts"
+#else
+#define FTS_DRIVER_NAME                     "dev_touch_ft6636u"
+#endif
 #define INTERVAL_READ_REG                   100  /* unit:ms */
 #define TIMEOUT_READ_REG                    1000 /* unit:ms */
 #if FTS_POWER_SOURCE_CUST_EN

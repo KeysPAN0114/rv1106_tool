@@ -25,6 +25,9 @@
 #include <linux/property.h>
 #include <linux/spinlock.h>
 
+#include <linux/gpio.h> //add
+#include <linux/of_gpio.h> //add
+
 #include <video/mipi_display.h>
 
 #include "fbtft.h"
@@ -74,6 +77,7 @@ static int fbtft_request_one_gpio(struct fbtft_par *par,
 				  const char *name, int index,
 				  struct gpio_desc **gpiop)
 {
+	#if 0
 	struct device *dev = par->info->device;
 
 	*gpiop = devm_gpiod_get_index_optional(dev, name, index,
@@ -85,6 +89,41 @@ static int fbtft_request_one_gpio(struct fbtft_par *par,
 		      __func__, name);
 
 	return 0;
+	#else
+	struct device *dev = par->info->device;
+    struct device_node *node = dev->of_node;
+    int gpio, flags, ret = 0;
+    enum of_gpio_flags of_flags;
+    if (of_find_property(node, name, NULL)) {
+        gpio = of_get_named_gpio_flags(node, name, index, &of_flags);
+        if (gpio == -ENOENT)
+            return 0;
+        if (gpio == -EPROBE_DEFER)
+            return gpio;
+        if (gpio < 0) {
+            dev_err(dev,
+                "failed to get '%s' from DT\n", name);
+            return gpio;
+        }
+         //active low translates to initially low
+        flags = (of_flags & OF_GPIO_ACTIVE_LOW) ? GPIOF_OUT_INIT_LOW :
+                            GPIOF_OUT_INIT_HIGH;
+        ret = devm_gpio_request_one(dev, gpio, flags,
+                        dev->driver->name);
+        if (ret) {
+            dev_err(dev,
+                "gpio_request_one('%s'=%d) failed with %d\n",
+                name, gpio, ret);
+            return ret;
+        }
+ 
+        *gpiop = gpio_to_desc(gpio);
+        fbtft_par_dbg(DEBUG_REQUEST_GPIOS, par, "%s: '%s' = GPIO%d\n",
+                            __func__, name, gpio);
+    }
+ 
+    return ret;
+	#endif
 }
 
 static int fbtft_request_gpios(struct fbtft_par *par)
@@ -223,8 +262,15 @@ static void fbtft_reset(struct fbtft_par *par)
 	usleep_range(20, 40);
 	gpiod_set_value_cansleep(par->gpio.reset, 0);
 	msleep(120);
+	#if 1
+	gpiod_set_value_cansleep(par->gpio.reset, 1);
+	msleep(120);
 
-	gpiod_set_value_cansleep(par->gpio.cs, 1);  /* Activate chip */
+	gpiod_set_value_cansleep(par->gpio.cs, 0);  /* Activate chip */
+	msleep(120);
+	#else
+	gpiod_set_value_cansleep(par->gpio.cs, 1);
+	#endif
 }
 
 static void fbtft_update_display(struct fbtft_par *par, unsigned int start_line,
@@ -1171,7 +1217,7 @@ static struct fbtft_platform_data *fbtft_properties_read(struct device *dev)
 	pdata->startbyte = fbtft_property_value(dev, "startbyte");
 	device_property_read_string(dev, "gamma", (const char **)&pdata->gamma);
 
-	if (device_property_present(dev, "led-gpios"))
+	if (device_property_present(dev, "led"))
 		pdata->display.backlight = 1;
 	if (device_property_present(dev, "init"))
 		pdata->display.fbtftops.init_display =
