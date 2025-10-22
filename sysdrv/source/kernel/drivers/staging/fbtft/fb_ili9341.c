@@ -128,6 +128,71 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 }
 
 #undef CURVE
+#if 0
+/* 16 bit convert to 18 bit pixel over 8-bit databus */
+static int write_vmem16_18bus8(struct fbtft_par *par, size_t offset, size_t len)
+{
+	u16 *vmem16;
+	u8 *txbuf = par->txbuf.buf;
+	size_t remain;
+	size_t to_copy;
+	size_t tx_array_size;
+	int i;
+	int ret = 0;
+
+	fbtft_par_dbg(DEBUG_WRITE_VMEM, par, "%s(offset=%zu, len=%zu)\n",
+		__func__, offset, len);
+
+	/* remaining number of pixels to send */
+	remain = len / 2;
+	vmem16 = (u16 *)(par->info->screen_buffer + offset);
+
+	if (par->gpio.dc != NULL)
+		gpiod_set_value(par->gpio.dc, 1);
+
+	/* number of pixels that fits in the transmit buffer */
+	tx_array_size = par->txbuf.len / 3;
+
+	while (remain) {
+		/* number of pixels to copy in one iteration of the loop */
+		to_copy = min(tx_array_size, remain);
+		dev_dbg(par->info->device, "    to_copy=%zu, remain=%zu\n",
+						to_copy, remain - to_copy);
+
+		for (i = 0; i < to_copy; i++) {
+			u16 pixel = vmem16[i];
+			u16 b = pixel & 0x1f;
+			u16 g = (pixel & (0x3f << 5)) >> 5;
+			u16 r = (pixel & (0x1f << 11)) >> 11;
+#if 1
+			u8 r8 = (r & 0x1F) << 3;
+			u8 g8 = (g & 0x3F) << 2;
+			u8 b8 = (b & 0x1F) << 3;
+
+			txbuf[i * 3 + 0] = r8;
+			txbuf[i * 3 + 1] = g8;
+			txbuf[i * 3 + 2] = b8;
+#else
+			// 更精确的18位RGB666转换
+			u8 r6 = (r << 1) | (r >> 4);   // 5位->6位：0-31 -> 0-63
+			u8 g6 = g;                     // 6位保持不变：0-63
+			u8 b6 = (b << 1) | (b >> 4);   // 5位->6位：0-31 -> 0-63
+
+			txbuf[i * 3 + 0] = r6 << 2;    // 6位左移2位，填充到8位字节中
+			txbuf[i * 3 + 1] = g6 << 2;    
+			txbuf[i * 3 + 2] = b6 << 2;
+#endif
+		}
+
+		vmem16 = vmem16 + to_copy;
+		ret = par->fbtftops.write(par, par->txbuf.buf, to_copy * 3);
+		if (ret < 0)
+			return ret;
+		remain -= to_copy;
+	}
+	return ret;
+}
+#endif
 
 static struct fbtft_display display = {
 	.regwidth = 8,
@@ -144,6 +209,7 @@ static struct fbtft_display display = {
 		.set_gamma = set_gamma,
 	},
 };
+		// .write_vmem = write_vmem16_18bus8,
 
 FBTFT_REGISTER_DRIVER(DRVNAME, "ilitek,ili9341", &display);
 
