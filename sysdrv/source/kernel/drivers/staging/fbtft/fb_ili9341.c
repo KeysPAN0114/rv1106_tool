@@ -48,6 +48,7 @@ static int init_display(struct fbtft_par *par)
 	write_reg(par, 0xC5, 0x35, 0x3E);
 	write_reg(par, 0xC7, 0xBE);
 	/* ------------memory access control------------------------ */
+	// write_reg(par, MIPI_DCS_SET_ADDRESS_MODE, 0x08); // 添加此行以启用反色
 	write_reg(par, MIPI_DCS_SET_PIXEL_FORMAT, 0x55); /* 16bit pixel */
 	/* ------------frame rate----------------------------------- */
 	write_reg(par, 0xB1, 0x00, 0x1B);
@@ -60,7 +61,7 @@ static int init_display(struct fbtft_par *par)
 	write_reg(par, MIPI_DCS_EXIT_SLEEP_MODE);
 	mdelay(100);
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
-	mdelay(20);
+
 	write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);
 	mdelay(20);
 
@@ -130,7 +131,7 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 }
 
 #undef CURVE
-#if 1
+#if 0
 /* 16 bit convert to 18 bit pixel over 8-bit databus */
 static int write_vmem16_18bus8(struct fbtft_par *par, size_t offset, size_t len)
 {
@@ -209,7 +210,7 @@ static struct fbtft_display display = {
 		.set_addr_win = set_addr_win,
 		.set_var = set_var,
 		.set_gamma = set_gamma,
-		.write_vmem = write_vmem16_18bus8,
+		// .write_vmem = write_vmem16_18bus8,
 	},
 };
 		// .write_vmem = write_vmem16_18bus8,
