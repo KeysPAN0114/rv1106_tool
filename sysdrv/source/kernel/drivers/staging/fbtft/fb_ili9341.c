@@ -61,6 +61,8 @@ static int init_display(struct fbtft_par *par)
 	mdelay(100);
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
 	mdelay(20);
+	write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);
+	mdelay(20);
 
 	return 0;
 }
@@ -128,7 +130,7 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 }
 
 #undef CURVE
-#if 0
+#if 1
 /* 16 bit convert to 18 bit pixel over 8-bit databus */
 static int write_vmem16_18bus8(struct fbtft_par *par, size_t offset, size_t len)
 {
@@ -207,6 +209,7 @@ static struct fbtft_display display = {
 		.set_addr_win = set_addr_win,
 		.set_var = set_var,
 		.set_gamma = set_gamma,
+		.write_vmem = write_vmem16_18bus8,
 	},
 };
 		// .write_vmem = write_vmem16_18bus8,

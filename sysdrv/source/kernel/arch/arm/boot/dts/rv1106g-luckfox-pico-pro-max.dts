@@ -178,7 +178,7 @@
 /**********I2C**********/
 /* I2C3_M1 */
 &i2c3 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-0 = <&i2c3m1_xfer>;
 	clock-frequency = <400000>;
     pinctrl-names = "default";
