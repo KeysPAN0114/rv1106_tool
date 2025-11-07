@@ -62,7 +62,7 @@ static int init_display(struct fbtft_par *par)
 	mdelay(100);
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
 
-	write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);
+	write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);	//打开反色 否则颜色不对
 	mdelay(20);
 
 	return 0;

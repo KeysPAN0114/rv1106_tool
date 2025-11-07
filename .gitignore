@@ -10,3 +10,5 @@ sysdrv/tools/board/memtester/memtester-4.6.0/
 sysdrv/tools/board/dosfstools/dosfstools-4.2/
 lvgl/workspace/lvgl_demo/build/
 lvgl/workspace/lvgl_demo/lv_drivers/
+demo/host/*.o
+demo/host/*.cmd

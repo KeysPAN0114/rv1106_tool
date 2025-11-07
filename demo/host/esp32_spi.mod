@@ -1,0 +1,2 @@
+/home/keys/luckfox-pico/demo/host/spi/esp_spi.o /home/keys/luckfox-pico/demo/host/esp_bt.o /home/keys/luckfox-pico/demo/host/main.o /home/keys/luckfox-pico/demo/host/esp_cmd.o /home/keys/luckfox-pico/demo/host/esp_utils.o /home/keys/luckfox-pico/demo/host/esp_cfg80211.o /home/keys/luckfox-pico/demo/host/esp_stats.o /home/keys/luckfox-pico/demo/host/esp_debugfs.o /home/keys/luckfox-pico/demo/host/esp_log.o
+

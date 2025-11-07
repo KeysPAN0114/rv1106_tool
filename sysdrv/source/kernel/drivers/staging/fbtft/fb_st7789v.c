@@ -142,7 +142,7 @@ static int init_display(struct fbtft_par *par)
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
 
 	if (HSD20_IPS)
-		// write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);
+		// write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);	//关闭反色显示，否则屏幕为负片效果
 
 	return 0;
 }

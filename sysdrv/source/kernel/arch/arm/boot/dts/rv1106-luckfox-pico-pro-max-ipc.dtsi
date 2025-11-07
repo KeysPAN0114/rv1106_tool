@@ -271,7 +271,7 @@
 	#size-cells = <0>;
 	spidev@0 {
 	compatible = "rockchip,spidev";
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <40000000>;
 		reg = <0>;
 	};
 
@@ -289,7 +289,7 @@
 		// reset = <&gpio1 RK_PC3 GPIO_ACTIVE_LOW>;    //RES
 		/*---------------------------------------------------*/
  
-		status = "okay";
+		status = "disabled";
 		compatible = "ilitek,ili9341";  
 		// compatible = "sitronix,st7789v";
 		reg = <0>;					
